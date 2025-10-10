@@ -1,20 +1,94 @@
-import App from "@/App";
-import dash from "../pages/dash";
-import { createBrowserRouter, RouterProvider } from "react-router";
-import React from "react";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
+import { MainLayout } from "@/features/layout";
+import { UserForm } from "@/features/user-form";
+import { LoginPage, SignupPage, ProtectedRoute } from "@/features/auth";
+import { AbacDemoPage } from "@/app/pages/AbacDemoPage";
+
+// Dashboard page component
+function DashboardPage() {
+  return (
+    <div className="space-y-4">
+      <h1 className="text-3xl font-bold">Dashboard</h1>
+      <p className="text-muted-foreground">
+        Welcome to your dashboard. This is a protected route.
+      </p>
+    </div>
+  );
+}
 
 const router = createBrowserRouter([
+  // Redirect root to dashboard
   {
     path: "/",
-    element: <App />,
+    element: <Navigate to="/dashboard" replace />,
   },
+
+  // Auth routes (public)
   {
-    path: "/dash",
-    element: React.createElement(dash),
+    path: "auth",
+    children: [
+      {
+        path: "login",
+        element: (
+          <ProtectedRoute requireAuth={false}>
+            <LoginPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "signup",
+        element: (
+          <ProtectedRoute requireAuth={false}>
+            <SignupPage />
+          </ProtectedRoute>
+        ),
+      },
+    ],
+  },
+
+  // Protected routes (require authentication)
+  {
+    path: "/",
+    element: (
+      <ProtectedRoute>
+        <MainLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        path: "dashboard",
+        element: <DashboardPage />,
+      },
+      {
+        path: "users",
+        element: (
+          <div>
+            <h1 className="text-3xl font-bold">Users</h1>
+            <p className="text-muted-foreground mt-2">Users page coming soon...</p>
+          </div>
+        ),
+      },
+      {
+        path: "settings",
+        element: (
+          <div>
+            <h1 className="text-3xl font-bold">Settings</h1>
+            <p className="text-muted-foreground mt-2">Settings page coming soon...</p>
+          </div>
+        ),
+      },
+      {
+        path: "user-form",
+        element: <UserForm />,
+      },
+      {
+        path: "permissions-demo",
+        element: <AbacDemoPage />,
+      },
+    ],
   },
 ]);
 
-
-export const AppRoutes =()=>{
-    return <RouterProvider router={router}></RouterProvider>
-}
+export const AppRoutes = () => {
+  return <RouterProvider router={router} />;
+};

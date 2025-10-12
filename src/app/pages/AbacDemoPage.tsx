@@ -474,6 +474,7 @@ export const AbacDemoPage = () => {
         </Card>
       </section>
 
+
       {/* Section 5: Admin-Only Actions */}
       <section>
         <h2 className="text-2xl font-bold mb-4">⚙️ Admin-Only Actions</h2>

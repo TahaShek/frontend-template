@@ -3,8 +3,8 @@
  * Full-page responsive signup with modern design
  */
 
-import { SignupForm } from '../SignupForm';
-import { AuthLayout } from '../components/AuthLayout';
+import { SignupForm } from "../components/SignupForm";
+import { AuthLayout } from "../components/AuthLayout";
 
 export const SignupPage = () => {
   return (
@@ -16,4 +16,3 @@ export const SignupPage = () => {
     </AuthLayout>
   );
 };
-

@@ -4,30 +4,29 @@
  */
 
 // Types
-export * from './types';
+export * from "./types";
 
 // Store
-export * from './store';
+export * from "./store";
 
 // Hooks
-export * from './hooks';
+export * from "./hooks";
 
 // API
-export { authApi } from './authapi';
+export { authApi } from "./authapi";
 
 // Schemas
-export * from './authschema';
+export * from "./authschema";
 
 // Components
-export * from './components';
+export * from "./components";
 
 // Forms
-export { LoginForm } from './LoginForm';
-export { SignupForm } from './SignupForm';
+export { LoginForm } from "./components/LoginForm";
+export { SignupForm } from "./components/SignupForm";
 
 // Pages
-export * from './pages';
+export * from "./pages";
 
 // Mocks (for testing)
-export * from './mocks';
-
+export * from "./mocks";

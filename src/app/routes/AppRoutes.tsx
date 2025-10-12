@@ -3,18 +3,19 @@ import { MainLayout } from "@/features/layout";
 import { UserForm } from "@/features/user-form";
 import { LoginPage, SignupPage, ProtectedRoute } from "@/features/auth";
 import { AbacDemoPage } from "@/app/pages/AbacDemoPage";
+import DemoPage from "@/features/page";
 
 // Dashboard page component
-function DashboardPage() {
-  return (
-    <div className="space-y-4">
-      <h1 className="text-3xl font-bold">Dashboard</h1>
-      <p className="text-muted-foreground">
-        Welcome to your dashboard. This is a protected route.
-      </p>
-    </div>
-  );
-}
+// function dashboardPage() {
+//   return (
+//     <div className="space-y-4">
+//       <h1 className="text-3xl font-bold">Dashboard</h1>
+//       <p className="text-muted-foreground">
+//         Welcome to your dashboard. This is a protected route.
+//       </p>
+//     </div>
+//   );
+// }
 
 const router = createBrowserRouter([
   // Redirect root to dashboard
@@ -57,14 +58,16 @@ const router = createBrowserRouter([
     children: [
       {
         path: "dashboard",
-        element: <DashboardPage />,
+        element: <DemoPage />,
       },
       {
         path: "users",
         element: (
           <div>
             <h1 className="text-3xl font-bold">Users</h1>
-            <p className="text-muted-foreground mt-2">Users page coming soon...</p>
+            <p className="text-muted-foreground mt-2">
+              Users page coming soon...
+            </p>
           </div>
         ),
       },
@@ -73,7 +76,9 @@ const router = createBrowserRouter([
         element: (
           <div>
             <h1 className="text-3xl font-bold">Settings</h1>
-            <p className="text-muted-foreground mt-2">Settings page coming soon...</p>
+            <p className="text-muted-foreground mt-2">
+              Settings page coming soon...
+            </p>
           </div>
         ),
       },

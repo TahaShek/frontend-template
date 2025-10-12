@@ -19,6 +19,8 @@ export const AuthLayout = ({ title, subtitle, children }: AuthLayoutProps) => {
       {/* Left Side - Branding & Info (Hidden on mobile) */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary/90 via-primary to-primary/80 p-12 text-white flex-col justify-between relative overflow-hidden">
         {/* Background Pattern */}
+
+        
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
             backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,

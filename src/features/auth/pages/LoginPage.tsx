@@ -3,8 +3,8 @@
  * Full-page responsive login with modern design
  */
 
-import { LoginForm } from '../LoginForm';
-import { AuthLayout } from '../components/AuthLayout';
+import { LoginForm } from "../components/LoginForm";
+import { AuthLayout } from "../components/AuthLayout";
 
 export const LoginPage = () => {
   return (
@@ -16,4 +16,3 @@ export const LoginPage = () => {
     </AuthLayout>
   );
 };
-

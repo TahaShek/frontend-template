@@ -3,13 +3,13 @@
  * Main hook for accessing ABAC functionality
  */
 
-import { useAbacContext } from '../context/useAbacContext';
+import { useAbacContext } from "../context/useAbacContext";
 import type {
   Action,
   IResourceAttributes,
   IAuthorizationDecision,
   IPermissionCheck,
-} from '../types';
+} from "../types";
 
 /**
  * useAbac Hook
@@ -48,7 +48,9 @@ export const useAbac = () => {
    */
   const checkAll = (checks: IPermissionCheck[]): boolean => {
     const results = context.canMultiple(checks);
-    return Object.values(results).every((decision) => (decision as IAuthorizationDecision).allowed);
+    return Object.values(results).every(
+      (decision) => (decision as IAuthorizationDecision).allowed
+    );
   };
 
   /**
@@ -56,7 +58,9 @@ export const useAbac = () => {
    */
   const checkAny = (checks: IPermissionCheck[]): boolean => {
     const results = context.canMultiple(checks);
-    return Object.values(results).some((decision) => (decision as IAuthorizationDecision).allowed);
+    return Object.values(results).some(
+      (decision) => (decision as IAuthorizationDecision).allowed
+    );
   };
 
   /**
@@ -85,4 +89,3 @@ export const useAbac = () => {
     isSameDepartment,
   };
 };
-

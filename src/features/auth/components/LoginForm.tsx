@@ -3,17 +3,17 @@
  * Responsive login form with validation
  */
 
-import { useState } from 'react';
-import { useForm, FormProvider } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Link, useNavigate } from 'react-router';
-import { Eye, EyeOff, LogIn, Loader2 } from 'lucide-react';
-import { loginSchema, type LoginFormData } from './authschema';
-import { useAuthStore } from './store';
-import { Button } from '@/components/ui/button';
-import { TextInput } from '@/components/form';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import { useState } from "react";
+import { useForm, FormProvider } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Link, useNavigate } from "react-router";
+import { Eye, EyeOff, LogIn, Loader2 } from "lucide-react";
+import { loginSchema, type LoginFormData } from "../authschema";
+import { useAuthStore } from "../store";
+import { Button } from "@/components/ui/button";
+import { TextInput } from "@/components/form";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 export const LoginForm = () => {
   const navigate = useNavigate();
@@ -27,15 +27,19 @@ export const LoginForm = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  const { handleSubmit, register, formState: { errors } } = methods;
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = methods;
 
   const onSubmit = handleSubmit(async (data) => {
     try {
       await login(data as LoginFormData);
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (error) {
       // Error is handled by the store
-      console.error('Login error:', error);
+      console.error("Login error:", error);
     }
   });
 
@@ -54,21 +58,25 @@ export const LoginForm = () => {
 
           {/* Password Field with Toggle */}
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-sm font-semibold">Password</Label>
+            <Label htmlFor="password" className="text-sm font-semibold">
+              Password
+            </Label>
             <div className="relative">
               <Input
                 id="password"
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 autoComplete="current-password"
-                {...register('password')}
-                className={`h-11 pr-11 ${errors.password ? 'border-red-500' : ''}`}
+                {...register("password")}
+                className={`h-11 pr-11 ${
+                  errors.password ? "border-red-500" : ""
+                }`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors p-1"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
                   <EyeOff className="h-5 w-5" />
@@ -88,7 +96,7 @@ export const LoginForm = () => {
               <input
                 id="rememberMe"
                 type="checkbox"
-                {...register('rememberMe')}
+                {...register("rememberMe")}
                 className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0 cursor-pointer"
               />
               <Label
@@ -137,7 +145,7 @@ export const LoginForm = () => {
       {/* Sign Up Link */}
       <div className="mt-6 text-center">
         <p className="text-base text-gray-700">
-          Don't have an account?{' '}
+          Don't have an account?{" "}
           <Link
             to="/auth/signup"
             className="font-semibold text-primary hover:underline underline-offset-2"
@@ -149,4 +157,3 @@ export const LoginForm = () => {
     </div>
   );
 };
-

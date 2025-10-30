@@ -10,7 +10,6 @@ import type {
   InternalAxiosRequestConfig,
 } from 'axios';
 import { axiosInstance } from './axios.config';
-import { AuthErrorCode } from '@/features/auth/types';
 
 // Extend InternalAxiosRequestConfig to include metadata
 declare module 'axios' {
@@ -224,7 +223,7 @@ const transformAxiosError = (error: AxiosError): ITransformedError => {
       : error.message || 'An error occurred';
 
     return {
-      code: getErrorCode(status),
+      // code: getErrorCode(status),
       message,
       status,
       details: data,
@@ -232,7 +231,7 @@ const transformAxiosError = (error: AxiosError): ITransformedError => {
   } else if (error.request) {
     // Request made but no response
     return {
-      code: AuthErrorCode.NETWORK_ERROR,
+      // code: AuthErrorCode.NETWORK_ERROR,
       message: 'Network error. Please check your connection.',
       status: 0,
       details: error.request,
@@ -240,7 +239,7 @@ const transformAxiosError = (error: AxiosError): ITransformedError => {
   } else {
     // Error in request setup
     return {
-      code: AuthErrorCode.UNKNOWN_ERROR,
+      // code: AuthErrorCode.UNKNOWN_ERROR,
       message: error.message || 'An unknown error occurred',
       status: 0,
       details: null,
@@ -251,26 +250,26 @@ const transformAxiosError = (error: AxiosError): ITransformedError => {
 /**
  * Get error code from HTTP status
  */
-const getErrorCode = (status: number): AuthErrorCode => {
-  switch (status) {
-    case 401:
-      return AuthErrorCode.UNAUTHORIZED;
-    case 403:
-      return AuthErrorCode.UNAUTHORIZED;
-    case 400:
-      return AuthErrorCode.VALIDATION_ERROR;
-    case 409:
-      return AuthErrorCode.USER_ALREADY_EXISTS;
-    default:
-      return AuthErrorCode.UNKNOWN_ERROR;
-  }
-};
+// const getErrorCode = (status: number): AuthErrorCode => {
+//   switch (status) {
+//     case 401:
+//       return AuthErrorCode.UNAUTHORIZED;
+//     case 403:
+//       return AuthErrorCode.UNAUTHORIZED;
+//     case 400:
+//       return AuthErrorCode.VALIDATION_ERROR;
+//     case 409:
+//       return AuthErrorCode.USER_ALREADY_EXISTS;
+//     default:
+//       return AuthErrorCode.UNKNOWN_ERROR;
+//   }
+// };
 
 /**
  * Transformed Error Interface
  */
 export interface ITransformedError {
-  code: AuthErrorCode;
+  // code: AuthErrorCode;
   message: string;
   status: number;
   details: unknown;

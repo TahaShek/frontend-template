@@ -1,8 +1,3 @@
-/**
- * Mock Auth Service
- * For development and testing without a backend
- */
-
 import type { IAuthResponse, ILoginRequest, ISignupRequest } from '../types';
 import { UserRole } from '../types';
 import {
@@ -33,7 +28,17 @@ export const mockLogin = async (credentials: ILoginRequest): Promise<IAuthRespon
   const tokens = generateMockTokens(user.id);
 
   return {
-    user,
+    user: {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      role: user.role.toUpperCase() as UserRole,
+      avatar: user.avatar,
+      permissions: user.permissions,
+      createdAt: user.createdAt || new Date().toISOString(),
+      updatedAt: user.updatedAt || new Date().toISOString(),
+    },
     tokens,
     message: 'Login successful',
   };
@@ -65,6 +70,7 @@ export const mockSignup = async (credentials: ISignupRequest): Promise<IAuthResp
     lastName: credentials.lastName,
     role: UserRole.USER,
     avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${credentials.firstName}`,
+    permissions: [],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -95,7 +101,7 @@ export const mockLogout = async (): Promise<void> => {
 export const mockGetCurrentUser = async (userId: string) => {
   await new Promise((resolve) => setTimeout(resolve, 500));
   
-  const user = mockUsers.find((u) => u.id === userId);
+  const user = Object.values(mockUsers).find((u) => u.id === userId);
   if (!user) {
     throw {
       code: 'UNAUTHORIZED',
@@ -104,7 +110,17 @@ export const mockGetCurrentUser = async (userId: string) => {
     };
   }
 
-  return user;
+  return {
+    id: user.id,
+    email: user.email,
+    firstName: user.firstName || '',
+    lastName: user.lastName || '',
+    role: user.role.toUpperCase() as UserRole,
+    avatar: user.avatar,
+    permissions: user.permissions,
+    createdAt: user.createdAt || new Date().toISOString(),
+    updatedAt: user.updatedAt || new Date().toISOString(),
+  };
 };
 
 /**
@@ -126,4 +142,3 @@ export const mockRefreshToken = async (refreshToken: string) => {
   const userId = match[1];
   return generateMockTokens(userId);
 };
-

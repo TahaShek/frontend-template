@@ -1,41 +1,36 @@
-
-
-import { Home, Users, Settings, LayoutDashboard, LogOut, ClipboardEdit, Shield } from "lucide-react";
+import { Users, Settings, LayoutDashboard, LogOut, ClipboardEdit } from "lucide-react";
 import { Link, useLocation } from "react-router";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { useAbility } from "@/features/authorization";
+import type { Subjects } from "@/features/authorization/types/ability.types";
+import { useAuthStore } from "@/features/auth/store/auth.store";
 
 const navigationItems = [
   {
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
+    subject: 'Dashboard' as Subjects,
   },
   {
-    title: "Home",
-    href: "/",
-    icon: Home,
-  },
-  {
-    title: "Permissions Demo",
-    href: "/permissions-demo",
-    icon: Shield,
+    title: "Hello",
+    href: "/users",
+    icon: Users,
+    subject: 'Hello' as Subjects,  // Updated to match the new subject name
   },
   {
     title: "User Form",
     href: "/user-form",
     icon: ClipboardEdit,
-  },
-  {
-    title: "Users",
-    href: "/users",
-    icon: Users,
+    subject: 'UserForm' as Subjects,
   },
   {
     title: "Settings",
     href: "/settings",
     icon: Settings,
+    subject: 'Settings' as Subjects,
   },
 ];
 
@@ -46,6 +41,13 @@ interface SidebarProps {
 
 export function Sidebar({ className, onNavigate }: SidebarProps) {
   const location = useLocation();
+  const ability = useAbility();
+  const logout = useAuthStore((state) => state.logout);
+
+  // Filter navigation items based on permissions
+  const authorizedItems = navigationItems.filter(item => 
+    ability.can('read', item.subject)
+  );
 
   return (
     <div className={cn("flex h-full flex-col gap-2", className)}>
@@ -60,7 +62,7 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
       {/* Navigation */}
       <div className="flex-1 overflow-auto py-2">
         <nav className="grid gap-1 px-2 lg:px-4">
-          {navigationItems.map((item) => {
+          {authorizedItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.href;
 
@@ -90,6 +92,7 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
         <Button
           variant="ghost"
           className="w-full justify-start gap-3 text-muted-foreground hover:text-accent-foreground"
+          onClick={logout}
         >
           <LogOut className="h-4 w-4" />
           Logout
@@ -98,4 +101,3 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
     </div>
   );
 }
-

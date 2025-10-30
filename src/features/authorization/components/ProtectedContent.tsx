@@ -1,20 +1,18 @@
-/**
- * ProtectedContent Component
- * Advanced permission-based content rendering
- */
+import React from 'react';
+import { usePermissions } from '../hooks/usePermissions';
+import type { Actions, Subjects } from '../types/ability.types';
 
-import type { ReactNode } from 'react';
-import { useAbac } from '../hooks';
-import type { IPermissionCheck, IResourceAttributes, IAuthorizationDecision } from '../types';
+interface PermissionCheck {
+  action: Actions;
+  subject: Subjects;
+  conditions?: Record<string, unknown>;
+}
 
-/**
- * ProtectedContent Props
- */
 interface ProtectedContentProps {
-  checks: IPermissionCheck[];
-  requireAll?: boolean; // Require all checks to pass (default: false)
-  children: ReactNode;
-  fallback?: ReactNode;
+  checks: PermissionCheck[];
+  requireAll?: boolean;
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
   onUnauthorized?: (failedChecks: string[]) => void;
 }
 
@@ -25,32 +23,39 @@ interface ProtectedContentProps {
  * @example
  * <ProtectedContent
  *   checks={[
- *     { action: Action.READ, resourceType: ResourceType.DOCUMENT },
- *     { action: Action.UPDATE, resourceType: ResourceType.DOCUMENT },
+ *     { action: 'read', subject: 'User' },
+ *     { action: 'update', subject: 'User' },
  *   ]}
  *   requireAll={true}
  * >
- *   <DocumentEditor />
+ *   <UserEditor />
  * </ProtectedContent>
  */
-export const ProtectedContent = ({
+export const ProtectedContent: React.FC<ProtectedContentProps> = ({
   checks,
   requireAll = false,
   children,
   fallback = null,
   onUnauthorized,
-}: ProtectedContentProps) => {
-  const { checkAll, checkAny, canMultiple } = useAbac();
+}) => {
+  const { can } = usePermissions();
 
-  // Determine if checks pass
-  const allowed = requireAll ? checkAll(checks) : checkAny(checks);
+  // Check all permissions
+  const results = checks.map(check => ({
+    check,
+    allowed: can(check.action, check.subject, check.conditions)
+  }));
 
-  if (!allowed) {
-    // Find which checks failed
-    const results = canMultiple(checks);
-    const failedChecks = Object.entries(results)
-      .filter(([, decision]) => !(decision as IAuthorizationDecision).allowed)
-      .map(([key]) => key);
+  // Determine if access is allowed based on requireAll flag
+  const isAllowed = requireAll
+    ? results.every(r => r.allowed)
+    : results.some(r => r.allowed);
+
+  if (!isAllowed) {
+    // Get failed check keys
+    const failedChecks = results
+      .filter(r => !r.allowed)
+      .map(r => `${r.check.action}:${r.check.subject}`);
 
     onUnauthorized?.(failedChecks);
     return <>{fallback}</>;
@@ -59,47 +64,42 @@ export const ProtectedContent = ({
   return <>{children}</>;
 };
 
-/**
- * OwnerOnly Component
- * Renders children only if user is the owner of the resource
- */
-interface OwnerOnlyProps {
-  resource: IResourceAttributes;
-  children: ReactNode;
-  fallback?: ReactNode;
+interface ResourceProps {
+  subject: Subjects;
+  id?: string;
+  conditions?: Record<string, unknown>;
 }
 
-export const OwnerOnly = ({ resource, children, fallback = null }: OwnerOnlyProps) => {
-  const { isOwner } = useAbac();
-
-  if (!isOwner(resource)) {
-    return <>{fallback}</>;
-  }
-
-  return <>{children}</>;
-};
-
-/**
- * SameDepartmentOnly Component
- * Renders children only if user is in same department as resource
- */
-interface SameDepartmentOnlyProps {
-  resource: IResourceAttributes;
-  children: ReactNode;
-  fallback?: ReactNode;
+interface ResourceGuardProps {
+  resource: ResourceProps;
+  action: Actions;
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
 }
 
-export const SameDepartmentOnly = ({
+/**
+ * ResourceGuard Component
+ * Protects content based on resource permissions
+ * 
+ * @example
+ * <ResourceGuard
+ *   resource={{ subject: 'Post', id: '123' }}
+ *   action="update"
+ * >
+ *   <EditButton />
+ * </ResourceGuard>
+ */
+export const ResourceGuard: React.FC<ResourceGuardProps> = ({
   resource,
+  action,
   children,
   fallback = null,
-}: SameDepartmentOnlyProps) => {
-  const { isSameDepartment } = useAbac();
+}) => {
+  const { can } = usePermissions();
 
-  if (!isSameDepartment(resource)) {
+  if (!can(action, resource.subject, resource.conditions)) {
     return <>{fallback}</>;
   }
 
   return <>{children}</>;
 };
-

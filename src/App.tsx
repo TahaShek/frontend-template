@@ -1,14 +1,18 @@
-import "./App.css";
-import { Button } from "@/components/ui/button";
+import { AbilityProvider } from './features/authorization';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { SocketProvider } from './features/realtime/context/SocketProvider';
+import { AppRoutes } from './app/routes/AppRoutes';
+import { Toaster } from '@/components/ui/sonner';
 
-function App() {
-
-
+export default function App() {
   return (
-    <>
-      <Button>Click me</Button>
-    </>
+    <AbilityProvider>
+      <ThemeProvider defaultTheme="system" storageKey="app-theme">
+        <SocketProvider>
+          <AppRoutes />
+          <Toaster richColors closeButton position="top-right" />
+        </SocketProvider>
+      </ThemeProvider>
+    </AbilityProvider>
   );
 }
-
-export default App;

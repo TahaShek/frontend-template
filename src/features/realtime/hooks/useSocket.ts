@@ -11,8 +11,8 @@ export function useSocket() {
     const token = localStorage.getItem("accessToken"); // or Zustand store
     const socket = io(SERVER_URL, {
       transports: ["websocket"],
-      autoConnect: true,
-      reconnection: true,
+      autoConnect: false,
+      reconnection: false,
       auth: { token },
     });
     socketRef.current = socket;

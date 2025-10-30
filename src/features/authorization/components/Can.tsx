@@ -1,70 +1,15 @@
-/**
- * Can Component
- * Conditionally render children based on permissions
- */
+import React from 'react';
+import { useAbility } from '../context/AbilityProvider';
+import type { Actions, Subjects } from '../types/ability.types';
 
-import type { ReactNode } from 'react';
-import { useAbac } from '../hooks';
-import type { Action, IResourceAttributes } from '../types';
-
-/**
- * Can Component Props
- */
 interface CanProps {
-  action: Action;
-  resource: IResourceAttributes;
-  children: ReactNode;
-  fallback?: ReactNode;
-  onUnauthorized?: () => void;
+  action: Actions;
+  subject: Subjects;
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
 }
 
-/**
- * Can Component
- * Renders children only if user has permission
- * 
- * @example
- * <Can action={Action.DELETE} resource={{ type: ResourceType.POST, id: '123' }}>
- *   <DeleteButton />
- * </Can>
- */
-export const Can = ({
-  action,
-  resource,
-  children,
-  fallback = null,
-  onUnauthorized,
-}: CanProps) => {
-  const { can } = useAbac();
-
-  const allowed = can(action, resource);
-
-  if (!allowed) {
-    onUnauthorized?.();
-    return <>{fallback}</>;
-  }
-
-  return <>{children}</>;
+export const Can: React.FC<CanProps> = ({ action, subject, children, fallback = null }) => {
+  const ability = useAbility();
+  return ability.can(action, subject) ? <>{children}</> : <>{fallback}</>;
 };
-
-/**
- * Cannot Component
- * Inverse of Can - renders children only if user lacks permission
- */
-interface CannotProps {
-  action: Action;
-  resource: IResourceAttributes;
-  children: ReactNode;
-}
-
-export const Cannot = ({ action, resource, children }: CannotProps) => {
-  const { cannot } = useAbac();
-
-  const notAllowed = cannot(action, resource);
-
-  if (!notAllowed) {
-    return null;
-  }
-
-  return <>{children}</>;
-};
-

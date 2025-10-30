@@ -1,21 +1,9 @@
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
 import { MainLayout } from "@/features/layout";
-import { UserForm } from "@/features/user-form";
+import { UserFormTabs } from "@/features/user-form/UserFormTabs";
 import { LoginPage, SignupPage, ProtectedRoute } from "@/features/auth";
-import { AbacDemoPage } from "@/app/pages/AbacDemoPage";
-import DemoPage from "@/features/page";
-
-// Dashboard page component
-// function dashboardPage() {
-//   return (
-//     <div className="space-y-4">
-//       <h1 className="text-3xl font-bold">Dashboard</h1>
-//       <p className="text-muted-foreground">
-//         Welcome to your dashboard. This is a protected route.
-//       </p>
-//     </div>
-//   );
-// }
+import DashboardPage from "@/app/pages/DashboardPage";
+import { PermissionGuard } from "@/features/authorization/components/PermissionGuard";
 
 const router = createBrowserRouter([
   // Redirect root to dashboard
@@ -58,37 +46,53 @@ const router = createBrowserRouter([
     children: [
       {
         path: "dashboard",
-        element: <DemoPage />,
+        element: (
+          <PermissionGuard subject="Dashboard">
+            <DashboardPage />
+          </PermissionGuard>
+        ),
       },
       {
         path: "users",
         element: (
-          <div>
-            <h1 className="text-3xl font-bold">Users</h1>
-            <p className="text-muted-foreground mt-2">
-              Users page coming soon...
-            </p>
-          </div>
+          <PermissionGuard subject="Hello">
+            <div>
+              <h1 className="text-3xl font-bold">Users</h1>
+              <p className="text-muted-foreground mt-2">
+                Users list coming soon...
+              </p>
+            </div>
+          </PermissionGuard>
         ),
       },
       {
         path: "settings",
         element: (
-          <div>
-            <h1 className="text-3xl font-bold">Settings</h1>
-            <p className="text-muted-foreground mt-2">
-              Settings page coming soon...
-            </p>
-          </div>
+          <PermissionGuard subject="Settings">
+            <div>
+              <h1 className="text-3xl font-bold">Settings</h1>
+              <p className="text-muted-foreground mt-2">
+                Settings page coming soon...
+              </p>
+            </div>
+          </PermissionGuard>
         ),
       },
       {
         path: "user-form",
-        element: <UserForm />,
+        element: (
+          <PermissionGuard subject="UserForm">
+            <UserFormTabs />
+          </PermissionGuard>
+        ),
       },
       {
-        path: "permissions-demo",
-        element: <AbacDemoPage />,
+        path: "user-form/:id",
+        element: (
+          <PermissionGuard subject="UserForm">
+            <UserFormTabs userId="123" />
+          </PermissionGuard>
+        ),
       },
     ],
   },
@@ -97,3 +101,4 @@ const router = createBrowserRouter([
 export const AppRoutes = () => {
   return <RouterProvider router={router} />;
 };
+

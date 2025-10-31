@@ -11,6 +11,9 @@ import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
 import { Loader2, Lock } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router";
+import { authApi } from "../authapi";
+import { useAuthStore } from "../store";
 
 const otpSchema = z.object({
   otp: z
@@ -35,15 +38,19 @@ export const OtpForm = () => {
   } = methods;
 
   const [isLoading, setIsLoading] = useState(false);
+  const [searchParams] = useSearchParams();
+  const email = searchParams.get("email");
+  const navigate = useNavigate();
+  const getCurrentUser = useAuthStore((s) => s.getCurrentUser);
   const otpValue = watch("otp");
 
   const onSubmit = handleSubmit(async (data) => {
+    if (!email) return;
     setIsLoading(true);
     try {
-      // Simulate backend verification
-      await new Promise((res) => setTimeout(res, 1500));
-      console.log("✅ OTP Verified:", data.otp);
-      // navigate("/dashboard");
+      await authApi.verifyOtp(email, data.otp);
+      await getCurrentUser();
+      navigate("/dashboard");
     } catch (error) {
       console.error("❌ OTP verification failed:", error);
     } finally {
@@ -110,7 +117,14 @@ export const OtpForm = () => {
           <div className="text-center mt-4">
             <button
               type="button"
-              onClick={() => console.log("🔁 Resend OTP")}
+              onClick={async () => {
+                if (!email) return;
+                try {
+                  await authApi.loginWithOtp(email);
+                } catch (e) {
+                  console.error(e);
+                }
+              }}
               className="text-sm text-primary font-semibold hover:underline underline-offset-2"
             >
               Didn’t get the code? Resend

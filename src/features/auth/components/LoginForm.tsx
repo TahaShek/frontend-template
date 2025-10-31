@@ -8,8 +8,9 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router";
 import { Eye, EyeOff, LogIn, Loader2 } from "lucide-react";
-import { loginSchema, type LoginFormData } from "../authschema";
+import { loginSchema } from "../authschema";
 import { useAuthStore } from "../store";
+import { authApi } from "../authapi";
 import { Button } from "@/components/ui/button";
 import { TextInput } from "@/components/form";
 import { Label } from "@/components/ui/label";
@@ -17,7 +18,6 @@ import { Input } from "@/components/ui/input";
 
 export const LoginForm = () => {
   const navigate = useNavigate();
-  const login = useAuthStore((state) => state.login);
   const error = useAuthStore((state) => state.error);
   const isLoading = useAuthStore((state) => state.isLoading);
 
@@ -35,11 +35,11 @@ export const LoginForm = () => {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      await login(data as LoginFormData);
-      navigate("/dashboard");
+      // OTP-first flow: request OTP, then navigate to OTP page with email
+      await authApi.loginWithOtp(data.email);
+      navigate(`/auth/otp?email=${encodeURIComponent(data.email)}`);
     } catch (error) {
-      // Error is handled by the store
-      console.error("Login error:", error);
+      console.error("Login with OTP error:", error);
     }
   });
 
@@ -141,6 +141,26 @@ export const LoginForm = () => {
           </Button>
         </form>
       </FormProvider>
+
+      {/* Divider */}
+      <div className="relative my-6">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-300"></div>
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className="px-4 bg-white text-gray-500">Or</span>
+        </div>
+      </div>
+
+      {/* OTP Login Button */}
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full h-11"
+        onClick={() => navigate("/auth/otp")}
+      >
+        Login with OTP
+      </Button>
 
       {/* Sign Up Link */}
       <div className="mt-6 text-center">

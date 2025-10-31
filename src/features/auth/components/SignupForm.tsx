@@ -37,7 +37,13 @@ export const SignupForm = () => {
   const onSubmit = handleSubmit(async (data) => {
     try {
       await signup(data as SignupFormData);
-      navigate("/dashboard");
+      // After successful signup, redirect to check email page
+      navigate("/auth/check-email", { 
+        state: { 
+          email: data.email,
+          message: "Please check your email to verify your account" 
+        } 
+      });
     } catch (error) {
       // Error is handled by the store
       console.error("Signup error:", error);

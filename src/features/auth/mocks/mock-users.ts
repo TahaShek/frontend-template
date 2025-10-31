@@ -1,12 +1,11 @@
 import type { Permission } from '@/features/authorization/types/ability.types';
-import { UserRole } from '../types/auth.types';
 
 interface MockUser {
   id: string;
   email: string;
   firstName?: string;
   lastName?: string;
-  role: UserRole;
+  role: string; // Role as string for mock data
   permissions: Permission[];
   avatar?: string;
   password?: string;
@@ -17,7 +16,7 @@ export const mockUsers: Record<string, MockUser> = {
     id: '1',
     email: 'admin@example.com',
     password: 'admin123',
-    role: UserRole.ADMIN,
+    role: 'admin',
     firstName: 'Admin',
     lastName: 'User',
     permissions: [
@@ -29,7 +28,7 @@ export const mockUsers: Record<string, MockUser> = {
     id: '2',
     email: 'user@example.com',
     password: 'user123',
-    role: UserRole.USER,
+    role: 'user',
     firstName: 'Regular',
     lastName: 'User',
     permissions: [
@@ -48,7 +47,7 @@ export const mockUsers: Record<string, MockUser> = {
     id: '3',
     email: 'guest@example.com',
     password: 'guest123',
-    role: UserRole.GUEST,
+    role: 'guest',
     firstName: 'Guest',
     lastName: 'User',
     permissions: [

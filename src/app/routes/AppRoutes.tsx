@@ -1,9 +1,20 @@
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
 import { MainLayout } from "@/features/layout";
 import { UserFormTabs } from "@/features/user-form/UserFormTabs";
-import { LoginPage, SignupPage, ProtectedRoute } from "@/features/auth";
+import { 
+  LoginPage, 
+  SignupPage, 
+  CheckEmailPage,
+  EmailVerificationPage,
+  OtpPage,
+  ProtectedRoute 
+} from "@/features/auth";
 import DashboardPage from "@/app/pages/DashboardPage";
 import { PermissionGuard } from "@/features/authorization/components/PermissionGuard";
+import { ChatPage } from "@/features/chat/pages/ChatPage";
+import { NotificationPage } from "@/features/notifications/pages/NotificationPage";
+import { RealtimeDemo } from "@/features/realtime/examples/RealtimeDemo";
+import { MapsPage } from "@/features/maps/pages/MapsPage";
 
 const router = createBrowserRouter([
   // Redirect root to dashboard
@@ -29,6 +40,22 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requireAuth={false}>
             <SignupPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "check-email",
+        element: <CheckEmailPage />,
+      },
+      {
+        path: "verify-email",
+        element: <EmailVerificationPage />,
+      },
+      {
+        path: "otp",
+        element: (
+          <ProtectedRoute requireAuth={false}>
+            <OtpPage />
           </ProtectedRoute>
         ),
       },
@@ -91,6 +118,38 @@ const router = createBrowserRouter([
         element: (
           <PermissionGuard subject="UserForm">
             <UserFormTabs userId="123" />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: "chat",
+        element: (
+          <PermissionGuard subject="Chat">
+            <ChatPage />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: "notifications",
+        element: (
+          <PermissionGuard subject="Notifications">
+            <NotificationPage />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: "realtime-demo",
+        element: (
+          <PermissionGuard subject="Dashboard">
+            <RealtimeDemo />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: "maps",
+        element: (
+          <PermissionGuard subject="Maps">
+            <MapsPage />
           </PermissionGuard>
         ),
       },

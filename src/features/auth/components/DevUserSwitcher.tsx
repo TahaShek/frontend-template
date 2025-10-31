@@ -13,15 +13,18 @@ export const DevUserSwitcher: React.FC = () => {
     const mockUser = mockUsers[userId];
     if (mockUser) {
       const user: IUser = {
+        _id: mockUser.id,
         id: mockUser.id,
-        role: mockUser.role.toUpperCase() as IUser['role'],
-        permissions: mockUser.permissions,
         email: mockUser.email,
+        name: `${mockUser.firstName || ''} ${mockUser.lastName || ''}`.trim(),
         firstName: mockUser.firstName || '',
         lastName: mockUser.lastName || '',
+        role: [{ name: mockUser.role.toUpperCase() }],
+        isVerified: true,
         avatar: mockUser.avatar,
-        createdAt: mockUser.createdAt || new Date().toISOString(),
-        updatedAt: mockUser.updatedAt || new Date().toISOString(),
+        permissions: mockUser.permissions,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
       setUser(user);
     }
@@ -34,7 +37,13 @@ export const DevUserSwitcher: React.FC = () => {
         {Object.entries(mockUsers).map(([key, user]) => (
           <Button
             key={key}
-            variant={currentUser?.role.toLowerCase() === user.role ? "default" : "outline"}
+            variant={
+              currentUser?.role && 
+              Array.isArray(currentUser.role) && 
+              currentUser.role[0]?.name.toLowerCase() === user.role 
+                ? "default" 
+                : "outline"
+            }
             onClick={() => handleUserSwitch(key)}
             className="justify-start"
           >

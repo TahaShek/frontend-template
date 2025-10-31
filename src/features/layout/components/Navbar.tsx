@@ -1,4 +1,4 @@
-import { Menu, Bell, Search, LogOut, User, Settings } from "lucide-react";
+import { Menu, Search, LogOut, User, Settings } from "lucide-react";
 import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,6 +14,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Sidebar } from "./Sidebar";
 import { useAuthStore } from "@/features/auth";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { NotificationBell } from "@/features/notifications";
 
 export function Navbar() {
   const navigate = useNavigate();
@@ -70,13 +71,7 @@ export function Navbar() {
         <ThemeToggle />
 
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-medium text-white">
-            3
-          </span>
-          <span className="sr-only">Notifications</span>
-        </Button>
+        <NotificationBell />
 
         {/* User Menu */}
         <DropdownMenu>
@@ -122,35 +117,6 @@ export function Navbar() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <NotificationBell />
     </header>
-  );
-}
-
-// src/features/realtime/components/NotificationBell.tsx
-import { useEffect, useState } from "react";
-import { useSocketContext } from "@/features/realtime/context/SocketProvider";
-
-export function NotificationBell() {
-  const { on, connected } = useSocketContext();
-  const [notifications, setNotifications] = useState<number>(0);
-
-  useEffect(() => {
-    if (!connected) return;
-    on("notification", (data) => {
-      console.log("📩 Notification received:", data);
-      setNotifications((prev) => prev + 1);
-    });
-  }, [connected]);
-
-  return (
-    <button className="relative p-2">
-      🔔
-      {notifications > 0 && (
-        <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1">
-          {notifications}
-        </span>
-      )}
-    </button>
   );
 }

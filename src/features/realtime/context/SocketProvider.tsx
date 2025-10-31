@@ -1,8 +1,8 @@
-// src/features/realtime/context/SocketProvider.tsx
 import React, { createContext, useContext } from "react";
 import { useSocket } from "../hooks/useSocket";
+import type { SocketContextValue } from "../types";
 
-const SocketContext = createContext<ReturnType<typeof useSocket> | null>(null);
+const SocketContext = createContext<SocketContextValue | null>(null);
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const socketData = useSocket();

@@ -1,4 +1,4 @@
-import { Users, Settings, LayoutDashboard, LogOut, ClipboardEdit } from "lucide-react";
+import { Users, Settings, LayoutDashboard, LogOut, ClipboardEdit, MessageSquare, Bell, Map } from "lucide-react";
 import { Link, useLocation } from "react-router";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,24 @@ const navigationItems = [
     href: "/dashboard",
     icon: LayoutDashboard,
     subject: 'Dashboard' as Subjects,
+  },
+  {
+    title: "Chat",
+    href: "/chat",
+    icon: MessageSquare,
+    subject: 'Chat' as Subjects,
+  },
+  {
+    title: "Notifications",
+    href: "/notifications",
+    icon: Bell,
+    subject: 'Notifications' as Subjects,
+  },
+  {
+    title: "Maps",
+    href: "/maps",
+    icon: Map,
+    subject: 'Maps' as Subjects,
   },
   {
     title: "Hello",

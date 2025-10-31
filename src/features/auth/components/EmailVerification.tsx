@@ -3,12 +3,15 @@
  * Handles verifying user's email when clicking the link sent to their inbox
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams, Link, useNavigate } from "react-router";
 import { CheckCircle, XCircle, Loader2, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { authApi } from "@/features/auth/authapi";
+
+
 
 type VerificationStatus = "loading" | "success" | "error";
 
@@ -17,36 +20,30 @@ export const VerifyEmail = () => {
   const token = searchParams.get("token");
   const [status, setStatus] = useState<VerificationStatus>("loading");
   const navigate = useNavigate();
+  const hasTriggeredRef = useRef(false);
 
   useEffect(() => {
-    const verifyEmail = async () => {
+    // Guard to prevent double-invocation in React 18 Strict Mode (dev only)
+    if (hasTriggeredRef.current) return;
+    hasTriggeredRef.current = true;
+
+    const runVerification = async () => {
       if (!token) {
         setStatus("error");
         return;
       }
-
       try {
-        // Simulate API call — replace this with your real API
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/auth/verify-email?token=${token}`,
-          { method: "GET" }
-        );
-
-        if (res.ok) {
-          setStatus("success");
-          // Optional: Redirect after delay
-          setTimeout(() => navigate("/auth/login"), 3000);
-        } else {
-          setStatus("error");
-        }
+        await authApi.verifyEmail(token);
+        setStatus("success");
+        // Optional: Redirect after delay
+        // setTimeout(() => navigate("/auth/login"), 3000);
       } catch (error) {
         console.error("Email verification failed:", error);
         setStatus("error");
       }
     };
-
-    verifyEmail();
-  }, [token, navigate]);
+    void runVerification();
+  }, [token]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-6">

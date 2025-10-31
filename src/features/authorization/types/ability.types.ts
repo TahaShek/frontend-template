@@ -6,6 +6,9 @@ export type Actions = 'create' | 'read' | 'update' | 'delete' | 'manage';
 // All possible subjects (make sure they match your routes exactly)
 export type Subjects = 
   | 'Dashboard'
+  | 'Chat'
+  | 'Notifications'
+  | 'Maps'
   | 'Hello'      // For users list/management
   | 'UserForm'   // For user form
   | 'Settings'

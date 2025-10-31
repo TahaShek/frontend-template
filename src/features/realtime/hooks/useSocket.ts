@@ -1,58 +1,151 @@
 import { io, Socket } from "socket.io-client";
-import { useEffect, useRef, useState } from "react";
-
-const SERVER_URL = import.meta.env.VITE_API_URL || "http://localhost:4000"; // your backend base URL
+import { useEffect, useRef, useState, useCallback } from "react";
+import { SOCKET_CONFIG } from "../config/socket.config";
+import type { ConnectionStatus } from "../types";
 
 export function useSocket() {
   const socketRef = useRef<Socket | null>(null);
-  const [connected, setconneted] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>({
+    connected: false,
+    connecting: false,
+    error: null,
+    reconnectAttempts: 0,
+  });
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken"); // or Zustand store
-    const socket = io(SERVER_URL, {
-      transports: ["websocket"],
-      autoConnect: false,
-      reconnection: false,
+    // Get auth token from storage
+    const token = localStorage.getItem("accessToken");
+    
+    // Initialize socket connection
+    const socket = io(SOCKET_CONFIG.url, {
+      ...SOCKET_CONFIG.options,
       auth: { token },
     });
+
     socketRef.current = socket;
-    socket.on("connect", () => {
-      console.log("connected");
-      setconneted(true);
-    });
-    socket.on("disconnect", (reason) => {
-      console.warn("⚠️ Disconnected:", reason);
-      setconneted(false);
+
+    // Connection event handlers
+    socket.on(SOCKET_CONFIG.events.CONNECT, () => {
+      console.log("✅ Socket connected:", socket.id);
+      setConnectionStatus({
+        connected: true,
+        connecting: false,
+        error: null,
+        reconnectAttempts: 0,
+      });
     });
 
-    socket.on("connect_error", (err) => {
+    socket.on(SOCKET_CONFIG.events.DISCONNECT, (reason) => {
+      console.warn("⚠️ Socket disconnected:", reason);
+      setConnectionStatus(prev => ({
+        ...prev,
+        connected: false,
+        connecting: false,
+        error: reason === "io server disconnect" ? "Server disconnected" : null,
+      }));
+    });
+
+    socket.on(SOCKET_CONFIG.events.CONNECT_ERROR, (err) => {
       console.error("❌ Connection error:", err.message);
+      setConnectionStatus(prev => ({
+        ...prev,
+        connected: false,
+        connecting: false,
+        error: err.message,
+      }));
     });
 
+    socket.io.on(SOCKET_CONFIG.events.RECONNECT_ATTEMPT, (attempt) => {
+      console.log(`🔄 Reconnection attempt ${attempt}...`);
+      setConnectionStatus(prev => ({
+        ...prev,
+        connecting: true,
+        reconnectAttempts: attempt,
+      }));
+    });
+
+    socket.io.on(SOCKET_CONFIG.events.RECONNECT, (attempt) => {
+      console.log(`✅ Reconnected after ${attempt} attempts`);
+      setConnectionStatus({
+        connected: true,
+        connecting: false,
+        error: null,
+        reconnectAttempts: 0,
+      });
+    });
+
+    socket.io.on(SOCKET_CONFIG.events.RECONNECT_FAILED, () => {
+      console.error("❌ Reconnection failed");
+      setConnectionStatus(prev => ({
+        ...prev,
+        connected: false,
+        connecting: false,
+        error: "Failed to reconnect",
+      }));
+    });
+
+    // Cleanup on unmount
     return () => {
       socket.disconnect();
+      socket.removeAllListeners();
     };
   }, []);
-  const emit = (event: string, data?: any) => {
-    socketRef.current?.emit(event, data);
-  };
-const on = (event: string, handler: (...args: any[]) => void) => {
-  socketRef.current?.on(event, (...args) => {
-    const data = args[0];
-    console.log("📩 New notification:", data);
 
-    // show browser notification for every message
-    if (Notification.permission === "granted") {
-      new Notification("🔔 New Notification", {
-        body: data?.text || "You have a new message!",
-        icon: "/logo.png",
-        tag: Date.now().toString(), // unique tag
-      });
+  // Emit event
+  const emit = useCallback((event: string, data?: unknown) => {
+    if (!socketRef.current?.connected) {
+      console.warn("⚠️ Socket not connected. Cannot emit:", event);
+      return;
     }
+    socketRef.current.emit(event, data);
+  }, []);
 
-    handler(...args); // pass it to your component-level handler
-  });
-};
+  // Listen to event
+  const on = useCallback((event: string, handler: (...args: unknown[]) => void) => {
+    if (!socketRef.current) {
+      console.warn("⚠️ Socket not initialized. Cannot listen to:", event);
+      return;
+    }
+    socketRef.current.on(event, handler);
+  }, []);
 
-  return { socket: socketRef.current, connected, emit, on };
+  // Remove event listener
+  const off = useCallback((event: string, handler?: (...args: unknown[]) => void) => {
+    if (!socketRef.current) {
+      return;
+    }
+    if (handler) {
+      socketRef.current.off(event, handler);
+    } else {
+      socketRef.current.off(event);
+    }
+  }, []);
+
+  // Manual connect
+  const connect = useCallback(() => {
+    if (socketRef.current && !socketRef.current.connected) {
+      setConnectionStatus(prev => ({ ...prev, connecting: true }));
+      socketRef.current.connect();
+    }
+  }, []);
+
+  // Manual disconnect
+  const disconnect = useCallback(() => {
+    if (socketRef.current) {
+      socketRef.current.disconnect();
+    }
+  }, []);
+
+  return {
+    socket: socketRef.current,
+    connected: connectionStatus.connected,
+    connecting: connectionStatus.connecting,
+    error: connectionStatus.error,
+    reconnectAttempts: connectionStatus.reconnectAttempts,
+    emit,
+    on,
+    off,
+    connect,
+    disconnect,
+  };
 }

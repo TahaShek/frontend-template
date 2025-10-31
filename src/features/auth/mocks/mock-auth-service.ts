@@ -28,19 +28,26 @@ export const mockLogin = async (credentials: ILoginRequest): Promise<IAuthRespon
   const tokens = generateMockTokens(user.id);
 
   return {
-    user: {
-      id: user.id,
-      email: user.email,
-      firstName: user.firstName || '',
-      lastName: user.lastName || '',
-      role: user.role.toUpperCase() as UserRole,
-      avatar: user.avatar,
-      permissions: user.permissions,
-      createdAt: user.createdAt || new Date().toISOString(),
-      updatedAt: user.updatedAt || new Date().toISOString(),
-    },
-    tokens,
+    statusCode: 200,
     message: 'Login successful',
+    success: true,
+    data: {
+      user: {
+        _id: user.id,
+        id: user.id,
+        email: user.email,
+        name: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        role: [{ name: user.role.toUpperCase() }],
+        avatar: user.avatar,
+        isVerified: true,
+        permissions: user.permissions,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      tokens,
+    },
   };
 };
 
@@ -62,28 +69,29 @@ export const mockSignup = async (credentials: ISignupRequest): Promise<IAuthResp
     };
   }
 
-  // Create new mock user
-  const newUser = {
-    id: `user-${Date.now()}`,
-    email: credentials.email,
-    firstName: credentials.firstName,
-    lastName: credentials.lastName,
-    role: UserRole.USER,
-    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${credentials.firstName}`,
-    permissions: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-
-  const tokens = generateMockTokens(newUser.id);
+  // Create new mock user  
+  const newUserId = `user-${Date.now()}`;
+  const userName = credentials.name || 'User';
 
   // In a real app, you'd save to database
-  console.log('New user created (mock):', newUser);
+  console.log('New user created (mock):', { id: newUserId, email: credentials.email, name: userName });
 
   return {
-    user: newUser,
-    tokens,
-    message: 'Account created successfully',
+    statusCode: 201,
+    message: 'Registration successful! Please check your email to verify your account.',
+    success: true,
+    data: {
+      _id: newUserId,
+      id: newUserId,
+      email: credentials.email,
+      name: userName,
+      role: [{ name: UserRole.USER }],
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${userName}`,
+      isVerified: false,
+      permissions: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
   };
 };
 
@@ -111,15 +119,18 @@ export const mockGetCurrentUser = async (userId: string) => {
   }
 
   return {
+    _id: user.id,
     id: user.id,
     email: user.email,
+    name: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
     firstName: user.firstName || '',
     lastName: user.lastName || '',
-    role: user.role.toUpperCase() as UserRole,
+    role: [{ name: user.role.toUpperCase() }],
     avatar: user.avatar,
+    isVerified: true,
     permissions: user.permissions,
-    createdAt: user.createdAt || new Date().toISOString(),
-    updatedAt: user.updatedAt || new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
 };
 

@@ -28,6 +28,7 @@ export const ProtectedRoute = ({
     if (!user && !isLoading && isAuthenticated) {
       getCurrentUser().catch(() => {
         // Handle error silently, will redirect to login
+        // g ap toh cake nikly
       });
     }
   }, [user, isLoading, isAuthenticated, getCurrentUser]);

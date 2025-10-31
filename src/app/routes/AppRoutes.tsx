@@ -13,6 +13,7 @@ import DashboardPage from "@/app/pages/DashboardPage";
 import { PermissionGuard } from "@/features/authorization/components/PermissionGuard";
 import { ChatPage } from "@/features/chat/pages/ChatPage";
 import { NotificationPage } from "@/features/notifications/pages/NotificationPage";
+import { NotificationApiDemo } from "@/features/notifications";
 import { RealtimeDemo } from "@/features/realtime/examples/RealtimeDemo";
 import { MapsPage } from "@/features/maps/pages/MapsPage";
 
@@ -135,6 +136,12 @@ const router = createBrowserRouter([
           <PermissionGuard subject="Notifications">
             <NotificationPage />
           </PermissionGuard>
+        ),
+      },
+      {
+        path: "notifications/demo",
+        element: (
+            <NotificationApiDemo />
         ),
       },
       {

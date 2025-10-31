@@ -82,6 +82,13 @@ export function useNotifications() {
     markAllAsRead: handleMarkAllAsRead,
     deleteNotification: handleDeleteNotification,
     clearAll,
+    // API methods from store
+    sendUserNotification: useNotificationStore.getState().sendUserNotification,
+    sendRoomNotification: useNotificationStore.getState().sendRoomNotification,
+    sendSystemAnnouncement: useNotificationStore.getState().sendSystemAnnouncement,
+    sendBulkNotifications: useNotificationStore.getState().sendBulkNotifications,
+    simulateScenario: useNotificationStore.getState().simulateScenario,
+    fetchAnalytics: useNotificationStore.getState().fetchAnalytics,
   };
 }
 

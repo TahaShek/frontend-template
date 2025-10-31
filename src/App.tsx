@@ -24,7 +24,7 @@ export default function App() {
   // Show loading screen while checking auth
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="min-h-screen flex items-center justify-center  ">
         <div className="text-center space-y-4">
           <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
           <p className="text-gray-600 text-lg">Loading...</p>
